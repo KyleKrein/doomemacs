@@ -49,3 +49,4 @@
 ;; (unpin! t)
 
 (package! evil-tutor)
+(package! cmake-ide)
