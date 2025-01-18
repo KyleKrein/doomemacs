@@ -24,6 +24,10 @@
 (setq doom-font (font-spec :size (* 16 2))
      doom-variable-pitch-font (font-spec :size (* 17 2))
      doom-big-font (font-spec :size (* 21 2)))
+
+(unless (equal "Battery status not available"
+               (battery))
+  (display-battery-mode 1))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -41,9 +45,12 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Documents/org/")
+(setq org-directory "~/Documents/org/"
+      org-roam-directory "~/Documents/org/")
+(after! org
+  (setq org-agenda-files '("~/Documents/org/")))
 
-
+(setq org-agenda-start-on-weekday 1) ;; Week starts on Monday instead of Sunday
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
