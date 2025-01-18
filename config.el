@@ -51,6 +51,10 @@
   (setq org-agenda-files '("~/Documents/org/")))
 
 (setq org-agenda-start-on-weekday 1) ;; Week starts on Monday instead of Sunday
+
+(setq resize-mini-windows t)
+(setq org-roam-node-display-template "${title} ${tags}")
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
