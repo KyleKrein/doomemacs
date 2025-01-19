@@ -61,6 +61,11 @@
 (setq resize-mini-windows t)
 (setq resize-mini-frames t)
 
+(if (string-match-p "termux" (getenv "HOME"))
+    (setq completion-styles '(basic substring ido))
+  (setq completion-styles '(orderless flex vertico)))
+
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
