@@ -50,3 +50,4 @@
 
 (package! evil-tutor)
 (package! cmake-ide)
+(package! org-roam-ui)

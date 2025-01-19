@@ -22,8 +22,8 @@
 ;; accept. For example:
 ;;
 (setq doom-font (font-spec :size (* 16 2))
-     doom-variable-pitch-font (font-spec :size (* 17 2))
-     doom-big-font (font-spec :size (* 21 2)))
+      doom-variable-pitch-font (font-spec :size (* 17 2))
+      doom-big-font (font-spec :size (* 21 2)))
 
 (unless (equal "Battery status not available"
                (battery))
@@ -48,12 +48,18 @@
 (setq org-directory "~/Documents/org/"
       org-roam-directory "~/Documents/org/")
 (after! org
-  (setq org-agenda-files '("~/Documents/org/")))
+  (setq org-agenda-files '("~/Documents/org/")
+        org-roam-node-display-template "${title} ${tags}"
+        org-agenda-start-on-weekday 1 ;; Week starts on Monday instead of Sunday
+        ))
 
-(setq org-agenda-start-on-weekday 1) ;; Week starts on Monday instead of Sunday
+(setq org-roam-ui-sync-theme t
+      org-roam-ui-follow t
+      org-roam-ui-update-on-save t
+      org-roam-ui-open-on-start t)
 
 (setq resize-mini-windows t)
-(setq org-roam-node-display-template "${title} ${tags}")
+(setq resize-mini-frames t)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
