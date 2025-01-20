@@ -48,7 +48,7 @@
 (setq org-directory "~/Documents/org/"
       org-roam-directory "~/Documents/org/")
 (after! org
-  (setq org-agenda-files '("~/Documents/org/")
+  (setq org-agenda-files nil
         org-roam-node-display-template "${title} ${tags}"
         org-agenda-start-on-weekday 1 ;; Week starts on Monday instead of Sunday
         ))
@@ -61,9 +61,129 @@
 (setq resize-mini-windows t)
 (setq resize-mini-frames t)
 
-(if (string-match-p "termux" (getenv "HOME"))
-    (setq completion-styles '(basic substring ido))
-  (setq completion-styles '(orderless flex vertico)))
+(amx-mode t)
+(setq org-roam-capture-templates
+      '(("d" "default" plain
+         "%?"
+         :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n")
+         :unnarrowed t)
+        ("p" "project" plain (file "./templates/project.org")
+         :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project\n")
+         :unnarrowed t)
+        ))
+
+(setq org-roam-dailies-capture-templates
+      '(("d" "default" entry "* %<%I:%M %p>: %?"
+         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n#+filetags: Daily\n"))))
+
+(defun org-roam-node-insert-immediate (arg &rest args)
+  (interactive "P")
+  (let ((args (cons arg args))
+        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                  '(:immediate-finish t)))))
+    (apply #'org-roam-node-insert args)))
+
+;; The buffer you put this code in must have lexical-binding set to t!
+
+(defun my/org-roam-filter-by-tag (tag-name)
+  (lambda (node)
+    (member tag-name (org-roam-node-tags node))))
+
+
+(require 'org-roam-node)
+(defun my/org-roam-list-notes-by-tag (tag-name)
+  (mapcar #'org-roam-node-file
+          (seq-filter
+           (my/org-roam-filter-by-tag tag-name)
+           (org-roam-node-list))))
+
+(defun my/org-roam-refresh-agenda-list ()
+  (interactive)
+  (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
+
+;; Build the agenda list the first time for the session
+(my/org-roam-refresh-agenda-list)
+
+
+(defun my/org-roam-project-finalize-hook ()
+  "Adds the captured project file to `org-agenda-files' if the
+capture was not aborted."
+  ;; Remove the hook since it was added temporarily
+  (remove-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Add project file to the agenda list if the capture was confirmed
+  (unless org-note-abort
+    (with-current-buffer (org-capture-get :buffer)
+      (add-to-list 'org-agenda-files (buffer-file-name)))))
+
+(defun my/org-roam-find-project ()
+  (interactive)
+  ;; Add the project file to the agenda after capture is finished
+  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Select a project file to open, creating it if necessary
+  (org-roam-node-find
+   nil
+   nil
+   (my/org-roam-filter-by-tag "Project")
+   :templates
+   '(("p" "project" plain (file "./templates/project.org")
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project\n")
+      :unnarrowed t))))
+
+(map! "C-c f p" #'my/org-roam-find-project)
+
+
+(defun my/org-roam-capture-inbox ()
+  (interactive)
+  (org-roam-capture- :node (org-roam-node-create)
+                     :templates '(("i" "inbox" plain "* %?"
+                                   :if-new (file+head "Inbox.org" "#+title: Inbox\n")))))
+
+(map! "C-c i" #'my/org-roam-capture-inbox)
+
+;;Capture a task directly into a specific project
+(defun my/org-roam-capture-task ()
+  (interactive)
+  ;; Add the project file to the agenda after capture is finished
+  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Capture the new task, creating the project file if necessary
+  (org-roam-capture- :node (org-roam-node-read
+                            nil
+                            (my/org-roam-filter-by-tag "Project"))
+                     :templates '(
+                                  ("p" "project" plain "* TODO %?"
+                                   :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                                                          "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
+                                                          ("Выполненные Задачи")))
+                                  )))
+
+(map! "C-c t" #'my/org-roam-capture-task)
+
+(defun my/org-roam-copy-todo-to-today ()
+  (interactive)
+  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+        (org-roam-dailies-capture-templates
+         '(("t" "tasks" entry "%?"
+            :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n#+filetags: Daily\n" ("Выполненные задачи")))))
+        (org-after-refile-insert-hook #'save-buffer)
+        today-file
+        pos)
+    (save-window-excursion
+      (org-roam-dailies--capture (current-time) t)
+      (setq today-file (buffer-file-name))
+      (setq pos (point)))
+
+    ;; Only refile if the target file is different than the current file
+    (unless (equal (file-truename today-file)
+                   (file-truename (buffer-file-name)))
+      (org-refile nil nil (list "Tasks" today-file nil pos)))))
+
+(add-to-list 'org-after-todo-state-change-hook
+             (lambda ()
+               (when (equal org-state "DONE")
+                 (my/org-roam-copy-todo-to-today))))
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
