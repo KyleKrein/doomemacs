@@ -156,7 +156,7 @@ capture was not aborted."
                                   ("p" "project" plain "* TODO %?"
                                    :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                                                           "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
-                                                          ("Выполненные Задачи")))
+                                                          ("Задачи")))
                                   )))
 
 (map! "C-c t" #'my/org-roam-capture-task)
