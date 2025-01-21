@@ -185,6 +185,35 @@ capture was not aborted."
                (when (equal org-state "DONE")
                  (my/org-roam-copy-todo-to-today))))
 
+;; Org-bullets gives us attractive bullets rather than asterisks
+(add-hook 'org-mode-hook 'org-indent-mode)
+(use-package org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+(setq use-file-dialog nil)   ;; No file dialog
+(setq use-dialog-box nil)    ;; No dialog box
+(setq pop-up-windows nil)    ;; No popup windows
+
+;; sudo-edit gives us the ability to open files with sudo privileges or switch over to editing with sudo privileges if we initially opened the file without such privileges.
+(use-package sudo-edit)
+
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+
+;; This is an icon set that can be used with dashboard, dired, ibuffer and other Emacs programs.
+(use-package all-the-icons-dired
+  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+
+;; Org level headers
+(custom-set-faces
+ '(org-level-1 ((t (:inherit outline-1 :height 1.45))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.35))))
+ '(org-level-3 ((t (:inherit outline-3 :height 1.30))))
+ '(org-level-4 ((t (:inherit outline-4 :height 1.25))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.20))))
+ '(org-level-6 ((t (:inherit outline-5 :height 1.15))))
+ '(org-level-7 ((t (:inherit outline-5 :height 1.10)))))
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.

@@ -52,3 +52,7 @@
 (package! cmake-ide)
 (package! org-roam-ui)
 (package! amx)
+(package! sudo-edit)
+(package! org-bullets)
+(package! all-the-icons)
+(package! all-the-icons-dired)
