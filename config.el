@@ -68,7 +68,7 @@
          "%?"
          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n")
          :unnarrowed t)
-        ("p" "project" plain (file "./templates/project.org")
+        ("p" "project" plain (file "~/.doom.d/templates/project.org")
          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project\n")
          :unnarrowed t)
         ))
@@ -128,9 +128,11 @@ capture was not aborted."
    nil
    (my/org-roam-filter-by-tag "Project")
    :templates
-   '(("p" "project" plain (file "./templates/project.org")
+   '(
+     ("p" "project" plain (file "~/.doom.d/templates/project.org")
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project\n")
-      :unnarrowed t))))
+      :unnarrowed t)
+     )))
 
 (map! "C-c f p" #'my/org-roam-find-project)
 
