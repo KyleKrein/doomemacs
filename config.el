@@ -62,6 +62,7 @@
 (setq resize-mini-frames t)
 
 (amx-mode t)
+(setq ido-show-dot-for-dired t)
 (setq org-roam-capture-templates
       '(("d" "default" plain
          "%?"
