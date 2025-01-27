@@ -21,9 +21,9 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
-(setq doom-font (font-spec :size (* 16 2))
-      doom-variable-pitch-font (font-spec :size (* 17 2))
-      doom-big-font (font-spec :size (* 21 2)))
+(setq doom-font (font-spec :size (* 20 1))
+      doom-variable-pitch-font (font-spec :size (* 21 1))
+      doom-big-font (font-spec :size (* 28 1)))
 
 (unless (equal "Battery status not available"
                (battery))
